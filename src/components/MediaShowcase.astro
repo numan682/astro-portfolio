@@ -1,0 +1,113 @@
+﻿---
+import fs from 'node:fs';
+import path from 'node:path';
+
+const publicDir = path.resolve(process.cwd(), 'public');
+const imgDir = path.join(publicDir, 'img');
+const videoDir = path.join(publicDir, 'video');
+const imageExts = new Set(['.webp', '.png', '.jpg', '.jpeg', '.gif', '.avif', '.svg']);
+const videoExts = new Set(['.mp4', '.webm', '.ogg', '.ogv']);
+
+const walk = (dir) => {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return walk(fullPath);
+    }
+    return [fullPath];
+  });
+};
+
+const toPublicUrl = (filePath) => {
+  const rel = path.relative(publicDir, filePath).replace(/\\/g, '/');
+  return `/${rel}`;
+};
+
+const toReadable = (filePath) => {
+  const base = path.basename(filePath, path.extname(filePath));
+  return base
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\d{2,5}x\d{2,5}\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const parseDims = (filePath) => {
+  const match = filePath.match(/(\d{2,5})x(\d{2,5})/);
+  if (match) {
+    return { width: Number(match[1]), height: Number(match[2]) };
+  }
+  return { width: 800, height: 600 };
+};
+
+const imageFiles = [...walk(imgDir), ...walk(videoDir)]
+  .filter((file) => imageExts.has(path.extname(file).toLowerCase()))
+  .sort();
+
+const videoFiles = walk(videoDir)
+  .filter((file) => videoExts.has(path.extname(file).toLowerCase()))
+  .sort();
+
+const images = imageFiles.map((file) => {
+  const { width, height } = parseDims(file);
+  return {
+    src: toPublicUrl(file),
+    alt: toReadable(file) || 'Portfolio media',
+    width,
+    height
+  };
+});
+
+const videos = videoFiles.map((file) => ({
+  src: toPublicUrl(file),
+  title: toReadable(file) || 'Portfolio reel'
+}));
+---
+
+<section class="media-showcase section bg-color-body">
+  <div class="container">
+    <div class="section-header text-center row-padding-bottom">
+      <span class="section-sub-title text-uppercase">asset library</span>
+      <h2 class="section-title text-uppercase">Full Media Showcase</h2>
+      <p class="section-text">
+        Every image and video from the portfolio library, curated into a single
+        responsive gallery.
+      </p>
+    </div>
+
+    {videos.length > 0 && (
+      <div class="media-showcase__videos">
+        {videos.map((video) => (
+          <figure class="media-showcase__video" aria-label={video.title}>
+            <video
+              src={video.src}
+              controls
+              preload="metadata"
+              playsinline
+              muted
+              class="w-100"
+            ></video>
+            <figcaption>{video.title}</figcaption>
+          </figure>
+        ))}
+      </div>
+    )}
+
+    <div class="media-showcase__grid">
+      {images.map((image) => (
+        <figure class="media-showcase__item">
+          <img
+            src={image.src}
+            alt={image.alt}
+            loading="lazy"
+            decoding="async"
+            width={image.width}
+            height={image.height}
+          />
+          <figcaption>{image.alt}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
