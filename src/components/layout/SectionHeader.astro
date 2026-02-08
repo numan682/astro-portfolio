@@ -1,0 +1,29 @@
+---
+const {
+  eyebrow,
+  title,
+  subtitle,
+  align = 'center',
+  class: className = '',
+  uppercase = false
+} = Astro.props;
+
+const hasTitleSlot = Boolean(Astro.slots.title);
+const headerClass = [
+  'section-header',
+  align === 'start' ? 'text-md-start' : 'text-center',
+  className
+]
+  .filter(Boolean)
+  .join(' ');
+---
+<div class={headerClass}>
+  {eyebrow && <span class="section-sub-title text-uppercase">{eyebrow}</span>}
+  {hasTitleSlot ? (
+    <slot name="title" />
+  ) : title ? (
+    <h2 class={`section-title${uppercase ? ' text-uppercase' : ''}`}>{title}</h2>
+  ) : null}
+  {subtitle && <p class="section-text">{subtitle}</p>}
+  <slot />
+</div>

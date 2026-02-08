@@ -1,0 +1,99 @@
+---
+import { site } from '../../data/site';
+import { mobileNav } from '../../data/navigation';
+
+const pathname = Astro.url.pathname;
+
+const normalizePath = (value) => {
+  if (!value) return '/';
+  return value !== '/' && value.endsWith('/') ? value.slice(0, -1) : value;
+};
+
+const currentPath = normalizePath(pathname);
+
+const isPathMatch = (href) => {
+  const normalized = normalizePath(href);
+  if (normalized === '/') return currentPath === '/';
+  return currentPath === normalized || currentPath.startsWith(`${normalized}/`);
+};
+
+const hasTopLevelMatch = mobileNav.some((item) => isPathMatch(item.href));
+
+const isActiveItem = (item) => {
+  if (isPathMatch(item.href)) return true;
+  if (item.children?.some(isActiveItem)) return true;
+  if (!hasTopLevelMatch && item.megaMenu?.some((column) => column.items.some(isActiveItem))) {
+    return true;
+  }
+  return false;
+};
+
+const itemClass = (item) => {
+  const classes = [];
+  if (item.megaMenu?.length) {
+    classes.push('menu-item-has-children', 'mega-menu-wrap');
+  } else if (item.children?.length) {
+    classes.push('menu-item-has-children');
+  }
+  if (isActiveItem(item)) {
+    classes.push('active');
+  }
+  return classes.join(' ');
+};
+---
+
+<div class="vs-menu-wrapper">
+  <div class="vs-menu-area text-center">
+    <div class="mobile-logo">
+      <a href="/" aria-label="Open link">
+        <img
+          src="/assets/images/logo.svg"
+          alt={site.name}
+          class="logo"
+          loading="lazy"
+          decoding="async"
+          width="193"
+          height="50"
+        />
+      </a>
+      <button class="vs-menu-toggle" aria-label="Toggle menu">
+        <i class="fal fa-times"></i>
+      </button>
+    </div>
+    <div class="vs-mobile-menu">
+      <ul>
+        {mobileNav.map((item) => (
+          <li class={itemClass(item)}>
+            <a href={item.href} aria-current={isActiveItem(item) ? 'page' : undefined}>
+              {item.label}
+            </a>
+            {item.megaMenu?.length ? (
+              <ul class="mega-menu">
+                {item.megaMenu.map((column) => (
+                  <li>
+                    <span class="page-title">{column.title}</span>
+                    <ul>
+                      {column.items.map((child) => (
+                        <li>
+                          <a href={child.href}>{child.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            ) : item.children?.length ? (
+              <ul class="sub-menu">
+                {item.children.map((child) => (
+                  <li>
+                    <a href={child.href}>{child.label}</a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>

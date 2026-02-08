@@ -1,5 +1,14 @@
-﻿---
+---
 import { site } from '../data/site';
+import { scriptBundles } from '../data/scripts';
+import Preloader from '../components/layout/Preloader.astro';
+import SiteHeader from '../components/layout/SiteHeader.astro';
+import MobileMenu from '../components/layout/MobileMenu.astro';
+import SearchModal from '../components/layout/SearchModal.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import ScrollToTop from '../components/layout/ScrollToTop.astro';
+import SiteScripts from '../components/layout/SiteScripts.astro';
+import Breadcrumb from '../components/layout/Breadcrumb.astro';
 
 const {
   title = site.metaTitle,
@@ -7,7 +16,9 @@ const {
   canonical,
   image = site.ogImage,
   noindex = false,
-  pageType = 'website'
+  pageType = 'website',
+  scripts = scriptBundles.standard,
+  breadcrumb
 } = Astro.props;
 
 const canonicalUrl = new URL(canonical ?? Astro.url.pathname, site.url).toString();
@@ -21,6 +32,18 @@ const structuredData = {
   jobTitle: site.role,
   image: ogImageUrl,
   sameAs: site.socials.filter(Boolean),
+  email: site.email,
+  telephone: site.phone,
+  contactPoint: [
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      email: site.email,
+      telephone: site.phone,
+      areaServed: 'Worldwide',
+      availableLanguage: ['en']
+    }
+  ],
   worksFor: {
     '@type': 'Organization',
     name: site.name
@@ -70,7 +93,17 @@ const structuredData = {
     <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
   </head>
   <body id="top">
-    <slot />
+    <Preloader />
+    <SiteHeader />
+    <MobileMenu />
+    <SearchModal />
+    <main>
+      {breadcrumb && <Breadcrumb {...breadcrumb} />}
+      <slot />
+    </main>
     <script is:inline src="/assets/js/portfolio-animations.js"></script>
+    <SiteFooter />
+    <ScrollToTop />
+    <SiteScripts scripts={scripts} />
   </body>
 </html>

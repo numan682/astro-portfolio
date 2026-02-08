@@ -1,0 +1,164 @@
+---
+import { site } from '../../data/site';
+import { desktopNav } from '../../data/navigation';
+
+const pathname = Astro.url.pathname;
+
+const normalizePath = (value) => {
+  if (!value) return '/';
+  return value !== '/' && value.endsWith('/') ? value.slice(0, -1) : value;
+};
+
+const currentPath = normalizePath(pathname);
+
+const isPathMatch = (href) => {
+  const normalized = normalizePath(href);
+  if (normalized === '/') return currentPath === '/';
+  return currentPath === normalized || currentPath.startsWith(`${normalized}/`);
+};
+
+const hasTopLevelMatch = desktopNav.some((item) => isPathMatch(item.href));
+
+const isActiveItem = (item) => {
+  if (isPathMatch(item.href)) return true;
+  if (item.children?.some(isActiveItem)) return true;
+  if (!hasTopLevelMatch && item.megaMenu?.some((column) => column.items.some(isActiveItem))) {
+    return true;
+  }
+  return false;
+};
+
+const itemClass = (item) => {
+  const classes = [];
+  if (item.megaMenu?.length) {
+    classes.push('menu-item-has-children', 'mega-menu-wrap');
+  } else if (item.children?.length) {
+    classes.push('menu-item-has-children');
+  }
+  if (isActiveItem(item)) {
+    classes.push('active');
+  }
+  return classes.join(' ');
+};
+
+---
+
+<div id="navbars" class="header-sticky navbars">
+  <div class="container header-container">
+    <div class="row justify-content-between align-items-center">
+      <div class="col-xl-9 col-lg-auto d-none d-lg-flex justify-center align-items-center">
+        <button class="vs-menu-toggle d-inline-block d-lg-none" aria-label="Toggle menu">
+          <i class="fal fa-bars"></i>
+        </button>
+        <div class="logo d-none d-lg-block">
+          <a href="/" aria-label="Open link">
+            <img
+              src="/assets/images/logo.svg"
+              alt={site.name}
+              class="logo"
+              loading="lazy"
+              decoding="async"
+              width="193"
+              height="50"
+            />
+          </a>
+        </div>
+        <nav class="main-menu d-none d-lg-block">
+          <ul>
+            {desktopNav.map((item) => (
+              <li class={itemClass(item)}>
+                <a href={item.href} aria-current={isActiveItem(item) ? 'page' : undefined}>
+                  {item.label}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="43"
+                    height="10"
+                    viewBox="0 0 43 10"
+                    fill="none"
+                  >
+                    <path
+                      d="M1.625 7.99988C7.71196 3.99988 24.2337 -1.60013 41.625 7.99988"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    />
+                  </svg>
+                </a>
+                {item.megaMenu?.length ? (
+                  <ul class="mega-menu">
+                    {item.megaMenu.map((column) => (
+                      <li>
+                        <span class="page-title">{column.title}</span>
+                        <ul>
+                          {column.items.map((child) => (
+                            <li>
+                              <a href={child.href}>{child.label}</a>
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                ) : item.children?.length ? (
+                  <ul class="sub-menu">
+                    {item.children.map((child) => (
+                      <li>
+                        <a href={child.href}>{child.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+      <div class="col-xl-3 col-lg-auto">
+        <div class="moblide-header">
+          <button class="vs-menu-toggle d-inline-block d-lg-none" aria-label="Toggle menu">
+            <i class="fal fa-bars"></i>
+          </button>
+          <div class="logo d-flex align-items-center d-lg-none">
+            <a href="/" aria-label="Open link">
+              <img
+                src="/assets/images/logo.svg"
+                alt={site.name}
+                class="logo"
+                loading="lazy"
+                decoding="async"
+                width="193"
+                height="50"
+              />
+            </a>
+          </div>
+          <div class="header-right">
+            <button class="search-btn" aria-label="Open search">
+              <i class="fa-regular fa-magnifying-glass"></i>
+            </button>
+            <div class="divider d-none d-lg-block">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="7"
+                height="33"
+                viewBox="0 0 7 33"
+                fill="none"
+              >
+                <circle cx="3.625" cy="16" r="3" fill="#E2C55D" />
+                <rect x="2.625" width="2" height="33" fill="#E2C55D" />
+              </svg>
+            </div>
+            <a href="/contact" class="btn-primary d-none d-lg-block">
+              <div class="btn-wrapper">
+                Let's talk
+                <span>
+                  <i class="fa-sharp fa-solid fa-arrow-up-right"></i>
+                  <i class="fa-sharp fa-solid fa-arrow-up-right"></i>
+                  <i class="fa-sharp fa-solid fa-arrow-up-right"></i>
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+---
+import { site } from '../../data/site';
+
+const {
+  logoSrc = '/assets/images/logo.svg',
+  logoAlt = site.name,
+  width = 193,
+  height = 50
+} = Astro.props;
+---
+
+<div class="preloader">
+  <div class="preloader-inner">
+    <img
+      src={logoSrc}
+      alt={logoAlt}
+      loading="lazy"
+      decoding="async"
+      width={width}
+      height={height}
+    />
+    <span class="loader"></span>
+  </div>
+</div>

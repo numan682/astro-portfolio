@@ -1,0 +1,37 @@
+---
+const {
+  title,
+  current,
+  background = '/assets/images/breadcrumb/breadcrumb-bg-1.png',
+  homeLabel = 'HOME',
+  homeHref = '/'
+} = Astro.props;
+
+const currentLabel = current ?? title;
+---
+
+<section
+  class="breadcrumb section position-relative overflow-hidden"
+  data-bg-src={background}
+>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 fade-anim" data-delay="1.3">
+        <div class="breadcrumb-content text-center">
+          <h1 class="breadcrumb-title">{title}</h1>
+          <nav aria-label="breadcrumb" class="breadcrumb-nav">
+            <ol class="breadcrumb justify-content-center">
+              <li class="breadcrumb-item">
+                <a href={homeHref}>{homeLabel}</a>
+              </li>
+              <li class="breadcrumb-separator mx-2">//</li>
+              <li class="breadcrumb-item active" aria-current="page">
+                {currentLabel}
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

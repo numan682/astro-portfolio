@@ -1,18 +1,20 @@
-﻿export const site = {
+export const site = {
   name: 'Devfolio',
-  author: 'Jordan Lee',
-  role: 'Full-Stack Developer',
+  author: 'Jh Numan',
+  role: 'Full Stack Software Developer',
   description:
-    'Full-stack developer portfolio showcasing product engineering, UI systems, and production-ready builds.',
+    'Full-stack software developer delivering production-ready web apps, performant UI systems, and reliable backend services.',
   keywords:
-    'full-stack developer, frontend engineering, backend development, portfolio, web apps, UI engineering, performance optimization, product engineering',
+    'full-stack developer, software engineer, frontend engineering, backend development, portfolio, web apps, UI engineering, performance optimization, product engineering, node.js, react, astro',
   url: 'https://jhnuman.com',
   themeColor: '#0f172a',
   ogImage: '/img/hero/01_hero-img.webp',
-  metaTitle: 'Devfolio | Full-Stack Developer Portfolio',
+  metaTitle: 'Jh Numan | Full Stack Software Developer',
+  email: 'jhnuman00@gmail.com',
+  phone: '+8801317558946',
   socials: [
     'https://github.com/numan682',
-    'https://www.linkedin.com/in/yourname',
-    'https://x.com/yourname'
+    'https://www.linkedin.com/in/jhnuman',
+    'https://x.com/jhnuman'
   ]
 };

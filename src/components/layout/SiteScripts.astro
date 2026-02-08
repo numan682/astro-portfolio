@@ -1,0 +1,7 @@
+---
+const { scripts = [] } = Astro.props;
+---
+
+{scripts.map((src) => (
+  <script is:inline src={src}></script>
+))}
